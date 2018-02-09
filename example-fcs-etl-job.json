@@ -1,0 +1,32 @@
+{
+    "inputs": {
+        "experimentalData": "agave://data-sd2e-community/temp/flow_etl/manifest_to_fcs_etl_params/b7cf7a75-9769-4d54-a807-ac81b92fb0af/experimental_data.json",
+        "processControl": "agave://data-sd2e-community/temp/flow_etl/manifest_to_fcs_etl_params/b7cf7a75-9769-4d54-a807-ac81b92fb0af/process_control_data.json",
+        "analysisParameters": "agave://data-sd2e-community/temp/flow_etl/manifest_to_fcs_etl_params/b7cf7a75-9769-4d54-a807-ac81b92fb0af/analysis_parameters.json",
+        "inputData": "agave://data-sd2e-community/ingest/testing/1516112572000/transcriptic/rule-30_q0/1/09242017",
+        "cytometerConfiguration": "agave://data-sd2e-community/temp/flow_etl/manifest_to_fcs_etl_params/b7cf7a75-9769-4d54-a807-ac81b92fb0af/cytometer_configuration.json",
+        "colorModelParameters": "agave://data-sd2e-community/temp/flow_etl/manifest_to_fcs_etl_params/b7cf7a75-9769-4d54-a807-ac81b92fb0af/color_model_parameters.json"
+    },
+    "name": "xVnP5xnvE2mKq.local/xVnP8lBYE8XlM.local",
+    "batchQueue": "normal",
+    "maxRunTime": "00:04:00",
+    "archivePath": null,
+    "notifications": [{
+            "url": "https://hookb.in/Z6Om4Ob1?job_id=${JOB_ID}&status=${JOB_STATUS}",
+            "event": "*",
+            "persistent": true
+        },
+        {
+            "url": "jed.singer@twosixlabs.com",
+            "event": "FINISHED",
+            "persistent": false
+        },
+        {
+            "url": "jed.singer@twosixlabs.com",
+            "event": "FAILED",
+            "persistent": false
+        }
+    ],
+    "appId": "fcs-etl-0.3.2u1",
+    "archive": false
+}

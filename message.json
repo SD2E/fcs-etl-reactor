@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "AbacoMessage",
+    "description": "Agave URI referring to a manifest file",
+    "type": "object",
+    "properties": {
+        "manifest_uri": {
+            "type": "string"
+        }
+    },
+    "required": ["uri"]
+}
