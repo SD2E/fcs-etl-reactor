@@ -136,6 +136,17 @@ def build_analysis_parameters():
           }
         ],
 
+        "TASBEConfig": {
+            "flow": {
+                "outputPointCloud": true,
+                "pointCloudPath": "output"
+            },
+            "OutputSettings": {
+                "StemName": "plots",
+                "FixedInputAxis": false
+            },
+            "outputDirectory": "output"
+        },
         "_comment6": "additional configuration parameters",
         "output": {
           "title": "placeholder",
@@ -164,6 +175,12 @@ def build_color_model(channels):
         "_comment1": "the rdf:about field is a URI that persistently identifies this run configuration",
         "rdf:about": "placeholder",
 
+        "TASBEConfig": {
+            "heatmapPlottype": "contour",
+            "plots": {
+                "plotPath": "plots"
+            }
+        },
         "_comment2": "Compatible TASBE interface version, following Semantic Versioning (semver.org).  Note that underspecifying version allows use of backward compatible upgrades.",
         "tasbe_version": "https://github.com/SD2E/reactors-etl/releases/tag/2",
 
@@ -257,9 +274,13 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
         "_comment4": "all files are URIs to the location of a file on the TA4 infrastructure",
         "bead_file": "''' + bead_file + '''",
         "_comment5": "name of the type of beads being used; must match an entry in the TASBE bead catalog https://github.com/TASBE/TASBEFlowAnalytics/blob/master/code/BeadCatalog.xlsx",
-        "bead_model": "''' + bead_model + '''",
         "_comment6": "name of the batch of beads being used; must match an entry in the TASBE bead catalog https://github.com/TASBE/TASBEFlowAnalytics/blob/master/code/BeadCatalog.xlsx",
-        "bead_batch": "''' + bead_batch + '''",
+        "TASBEConfig": {
+            "beads": {
+                "beadModel": "''' + bead_model + '''",
+                "beadBatch": "''' + bead_batch + '''"
+            }
+        },
 
         "_comment7": "the blank file should be wild-type or null transfection",
         "blank_file": "''' + blank_file + '''",
