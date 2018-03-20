@@ -27,7 +27,7 @@ pipeline {
         }
         stage('Build container') {
             steps {
-                sh "abaco deploy -R"
+                sh "abaco deploy -R -B reactor-test.rc"
             }
         }
         stage('Test locally') {
@@ -37,7 +37,8 @@ pipeline {
         }
         stage('Deploy to Abaco') {
             steps {
-                sh "abaco deploy -R"
+                sh "abaco deploy -B reactor-test.rc"
+                sh "abaco list"
             }
         }
         stage('Confirm deployment') {

@@ -1,0 +1,15 @@
+# Reactor mandatory settings
+REACTOR_NAME=launch_fcs_etl_app
+
+# Reactor optional settings
+# REACTOR_DESCRIPTION=
+# REACTOR_WORKERS=1
+# REACTOR_PRIVILEGED=0
+# REACTOR_STATELESS=0
+# REACTOR_USE_UID=0
+REACTOR_ALIAS=launch_fcs_etl_app
+
+# Docker settings
+DOCKER_HUB_ORG=sd2etest
+DOCKER_IMAGE_TAG=launch_fcs_etl_app
+DOCKER_IMAGE_VERSION=test
