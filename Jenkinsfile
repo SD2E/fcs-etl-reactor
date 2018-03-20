@@ -38,7 +38,7 @@ pipeline {
         stage('Deploy to Abaco') {
             steps {
                 // sh "abaco deploy -B reactor-test.rc || true"
-                sh "abaco create -V ${REGISTRY_USERNAME}/${CONTAINER_REPO}:${CONTAINER_TAG}"
+                sh "abaco create -V -n ${AGAVE_USERNAME}-${CONTAINER_REPO} ${REGISTRY_USERNAME}/${CONTAINER_REPO}:${CONTAINER_TAG}"
                 sh "abaco list"
             }
         }
