@@ -37,7 +37,8 @@ pipeline {
         }
         stage('Deploy to Abaco') {
             steps {
-                sh "abaco deploy -B reactor-test.rc ; ls -alth"
+                sh "abaco deploy -B reactor-test.rc || true"
+                sh "ls -alth"
                 sh "abaco list"
             }
         }
