@@ -7,7 +7,7 @@ destination:
   system_id: data-sd2e-community
 linked_reactors:
   fcs_etl_app:
-    id: jeg-fcs-etl-0.3.3
+    id: fcs-etl-0.3.5u1
     opts: ~
 job_params:
   data_subdir: instrument_output
@@ -17,7 +17,7 @@ job_definition:
   inputs: ~
   archiveSystem: ~
   archivePath: ~
-  appId: jeg-fcs-etl-0.3.3
+  appId: fcs-etl-0.3.5
   batchQueue: normal
   maxRunTime: '00:55:00'
   archive: true
@@ -25,9 +25,9 @@ job_definition:
   - url: https://hookb.in/Z6Om4Ob1?job_id=${JOB_ID}&status=${JOB_STATUS}
     event: "*"
     persistent: true
-  - url: jed.singer@twosixlabs.com
+  - url: notifications@sd2e.org
     event: FINISHED
     persistent: false
-  - url: jed.singer@twosixlabs.com
+  - url: notifications@sd2e.org
     event: FAILED
     persistent: false
