@@ -1,10 +1,14 @@
---- 
-source: 
+---
+source:
   base_path: /
   system_id: data-sd2e-community
-destination: 
+destination:
   base_path: /temp/flow_etl/launch_fcs_etl_app/
   system_id: data-sd2e-community
+linked_reactors:
+  fcs_etl_app:
+    id: jeg-fcs-etl-0.3.3
+    opts: ~
 job_params:
   data_subdir: instrument_output
   output_subdir: processed
