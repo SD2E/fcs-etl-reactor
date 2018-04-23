@@ -545,23 +545,21 @@ def main():
     # manifests (allowing for versioning). ETL apps can deposit results
     # under ABCDEF/processed/appid/<unique-directory-name>.
     r.logger.info('submitting FSC-ETL agave compute job')
-    job_id = None
-    if r.local is False:
-
-        try:
-            job_id = r.client.jobs.submit(body=job_def)['id']
-            r.logger.info("compute job id is {}".format(job_id))
-        except Exception as e:
-            # Use a print here so we can more easily snag the job def
-            # TODO - come back and take this out if we ever add a nonce to
-            #        the callback notifications because that should not
-            #        show up in the logs. One alternative would be to
-            #        register a plaintext log formatter with redaction
-            #        support, but that requires extending our logger module
-            print(json.dumps(job_def, indent=4))
-            r.on_failure(template.format(
-                actor_name, 'failed when submitting an agave compute job for',
-                job_def.appId, r.uid, r.execid), e)
+    job_id = 'mockup'
+    try:
+        job_id = r.client.jobs.submit(body=job_def)['id']
+        r.logger.info("compute job id is {}".format(job_id))
+    except Exception as e:
+        # Use a print here so we can more easily snag the job def
+        # TODO - come back and take this out if we ever add a nonce to
+        #        the callback notifications because that should not
+        #        show up in the logs. One alternative would be to
+        #        register a plaintext log formatter with redaction
+        #        support, but that requires extending our logger module
+        print(json.dumps(job_def, indent=4))
+        r.on_failure(template.format(
+            actor_name, 'failed when submitting an agave compute job for',
+            job_def.appId, r.uid, r.execid), e)
 
     # Make a nice human-readable success message for the Slack log
     suffix = '{} and will deposit outputs in {}'.format(

@@ -9,6 +9,12 @@ linked_reactors:
   fcs_etl_app:
     id: fcs-etl-0.3.5u1
     opts: ~
+  slackbot:
+    id: Dm01GJBOoAxvb
+logs:
+  level: DEBUG
+  file: ~
+  token: ~
 job_params:
   data_subdir: instrument_output
   output_subdir: processed
