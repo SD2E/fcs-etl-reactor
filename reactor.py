@@ -24,33 +24,14 @@ AGAVE_APP_ALIAS = 'fcs_etl_app'
 
 def on_success(self, successMessage):
     '''Custom success handler'''
-    try:
-        slackid = self.settings.linked_reactors.slackbot.id
-        slackchan = self.settings.linked_reactors.slackbot.opts.get(
-            'channel', 'notifications')
-        slacktxt = ':star2: {}'.format(successMessage)
-        slackmsg = {'text': slacktxt,
-                    'channel': slackchan}
-        self.send_message(slackid, slackmsg, ignoreErrors=True,
-                          retryMaxAttempts=1)
-    except Exception:
-        pass
+    self.loggers.slack.info("{}".format(successMessage))
     self.logger.info("{}".format(successMessage))
     sys.exit(0)
 
 
 def on_failure(self, failMessage, exceptionObject):
     '''Custom failure handler'''
-    try:
-        slackid = self.settings.linked_reactors.slackbot.id
-        slackchan = self.settings.linked_reactors.slackbot.opts.channel
-        slacktxt = ":bomb: {} : {}".format(failMessage, exceptionObject)
-        slackmsg = {'text': slacktxt,
-                    'channel': slackchan}
-        self.send_message(slackid, slackmsg, ignoreErrors=True,
-                          retryMaxAttempts=1)
-    except Exception:
-        pass
+    self.loggers.slack.critical("{} : {}".format(failMessage, exceptionObject))
     self.logger.critical("{} : {}".format(failMessage, exceptionObject))
     sys.exit(1)
 
