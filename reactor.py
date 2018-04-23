@@ -354,6 +354,7 @@ def main():
             'manifest file', r.uid, r.execid), e)
 
     r.logger.debug("fetching plan {}".format(plan_uri))
+    plan_abs_path = None
     try:
         (plan_system, plan_dirpath, plan_filename) =\
             agaveutils.from_agave_uri(plan_uri)
