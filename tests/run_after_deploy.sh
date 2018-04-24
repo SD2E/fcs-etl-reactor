@@ -17,5 +17,5 @@ source reactor.rc
 #     syd acl "${REACTOR_ALIAS}" world --read
 # fi
 
-abaco share -u ABACO_WORLD -p EXECUTE $ACTOR_ID
-abaco share -u world -p EXECUTE $ACTOR_ID
+abaco share -u ABACO_WORLD -p READ ${ACTOR_ID}
+abaco share -u world -p READ ${ACTOR_ID}

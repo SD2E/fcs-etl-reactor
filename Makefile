@@ -6,6 +6,7 @@ data-representation:
 
 clean:
 	rm -rf .hypothesis .pytest_cache __pycache__ */__pycache__
+	bash tests/remove_images.sh
 
 container-py3: data-representation
 	bash tests/run_deploy_with_updates.sh -R -k -F Dockerfile.py3
@@ -16,21 +17,23 @@ container: data-representation
 shell:
 	bash tests/run_container_tests.sh bash
 
-tests-local: clean
+tests-local:
 	bash tests/run_container_tests.sh pytest tests -s -vvv
 
-tests-reactor: clean
+tests-reactor:
 	bash tests/run_local_message.sh
 
-tests-deployed: clean
+tests-deployed:
 	bash tests/run_deployed_message.sh
 
 tests: tests-local tests-reactor
 	true
 
-trial-deploy: clean
+trial-deploy:
 	bash tests/run_deploy_with_updates.sh test
 
-deploy: clean
-	bash tests/run_deploy_with_updates.sh && \
+deploy:
+	bash tests/run_deploy_with_updates.sh
+
+after:
 	bash tests/run_after_deploy.sh
