@@ -503,6 +503,21 @@ def main():
     # programmatically with Python dict operations
 
     job_def = r.settings.job_definition
+
+    # add dynamically-generated callback to log aggregator
+    # it's gross to embed the URL and client_key here but the
+    # layered config file loading is borked and so we don't
+    # inherit from the 'default' settings for logger.
+    if r.settings.logs.get('token', None) is not None:
+        logger_uri = 'http://F3VRMUNrPeaq84zp:' + r.settings.logs.token +\
+            '@' + 'logger.sd2e.org:31311/reactors' + \
+            '?job_id=${JOB_ID}&status=${JOB_STATUS}'
+        logger_callback = {'persistent': True,
+                           'event': '*',
+                           'url': logger_uri}
+
+        job_def.notifications.append(logger_callback)
+
     app_record = r.settings.linked_reactors.get(AGAVE_APP_ALIAS, {})
     # this allows the appId to be set in the job_definition, but overridden
     # by configuration provided in settings.

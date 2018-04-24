@@ -38,3 +38,7 @@ job_definition:
 slack:
   channel: notifications
   webhook: ~
+logger:
+  client_key: F3VRMUNrPeaq84zp
+  path: /reactors
+  uri: "http://logger.sd2e.org:31311"
