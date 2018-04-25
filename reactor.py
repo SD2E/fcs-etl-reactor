@@ -503,26 +503,37 @@ def main():
     # programmatically with Python dict operations
 
     job_def = r.settings.job_definition
-
-    # add dynamically-generated callback to log aggregator
-    # it's gross to embed the URL and client_key here but the
-    # layered config file loading is borked and so we don't
-    # inherit from the 'default' settings for logger.
-    if r.settings.logs.get('token', None) is not None:
-        logger_uri = 'http://F3VRMUNrPeaq84zp:' + r.settings.logs.token +\
-            '@' + 'logger.sd2e.org:31311/reactors' + \
-            '?job_id=${JOB_ID}&status=${JOB_STATUS}'
-        logger_callback = {'persistent': True,
-                           'event': '*',
-                           'url': logger_uri}
-
-        job_def.notifications.append(logger_callback)
-
     app_record = r.settings.linked_reactors.get(AGAVE_APP_ALIAS, {})
+
     # this allows the appId to be set in the job_definition, but overridden
     # by configuration provided in settings.
     job_def_orig_appId = job_def.get('appId', None)
     job_def.appId = app_record.get('id', job_def_orig_appId)
+
+    # add dynamically-generated callback to log aggregator
+    # sends gross amounts of JSON in each POST
+    if r.settings.logs.get('token', None) is not None:
+
+        proto = r.settings.get('logger', {}).get('proto', 'http')
+        hostname = r.settings.get('logger', {}).get('host', 'localhost')
+        port = str(r.settings.get('logger', {}).get('port', 8080))
+        client_key = r.settings.get('logger', {}).get('client_key', 'KEY')
+        client_secret = r.settings.logs.get('token', 'SECRET')
+        # read loggger path from default -> reactor settings -> app settings
+        path = r.settings.get('logger', {}).get('path', '/logger')
+        path = app_record.get('opts', {}).get('logger', {}).get('path', path)
+
+        logger_uri = proto + '://' + client_key + ':' + client_secret + '@' +\
+            hostname + ':' + port + path + '/' + job_def.appId
+
+        logger_callback = {'persistent': True,
+                           'event': '*',
+                           'url': logger_uri}
+
+        nlist = list(job_def.notifications)
+        nlist.append(logger_callback)
+        ntuple = tuple(nlist)
+        job_def.notifications = ntuple
 
     job_def.inputs = job_def_inputs
     job_def.name = "{}-{}".format(

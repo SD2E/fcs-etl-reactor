@@ -8,7 +8,9 @@ destination:
 linked_reactors:
   fcs_etl_app:
     id: fcs-etl-0.3.5u1
-    opts: ~
+    opts:
+      logger:
+        path: /logger/apps
 logs:
   level: DEBUG
   file: ~
@@ -39,6 +41,4 @@ slack:
   channel: notifications
   webhook: ~
 logger:
-  client_key: F3VRMUNrPeaq84zp
-  path: /reactors
-  uri: "http://logger.sd2e.org:31311"
+  path: /logger/apps

@@ -1,11 +1,14 @@
 .PHONY: tests container tests-local tests-reactor tests-deployed data-representation
 .SILENT: tests container tests-local tests-reactor tests-deployed data-representation
 
+all: clean container deploy after
+	true
+
 data-representation:
 	git submodule update --init
 
 clean:
-	rm -rf .hypothesis .pytest_cache __pycache__ */__pycache__
+	rm -rf .hypothesis .pytest_cache __pycache__ */__pycache__ tmp.*
 	bash tests/remove_images.sh
 
 container-py3: data-representation
