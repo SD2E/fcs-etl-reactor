@@ -1,13 +1,5 @@
 ACTOR_ID=$1
-MESSAGE='{"uri":"agave://data-sd2e-community/ingest/testing/1516919757000/transcriptic/rule-30_q0/1/09242017/manifest/manifest.json"}'
-
-if [ -z "${ACTOR_ID}" ]
-then
-    if [ -f .ACTOR_ID ]
-    then
-        ACTOR_ID=$(cat .ACTOR_ID)
-    fi
-fi
+MESSAGE='{"source":{"system_id":"data-sd2e-ingest","absolute_path":"sd2e-community/ingest/testing/biofab/yeast-gates_q0/3/manifest/107795-manifest.json","left_trim":"sd2e-community","parent_levels":2},"destination":{"system_id":"data-sd2e-community","dest_root_path":"/","parent_levels":2}}'
 
 if [ -z "${ACTOR_ID}" ]
 then
@@ -15,8 +7,8 @@ then
     exit 1
 fi
 
-MAX_ELAPSED=600 # Maximum duration for any async task
-INITIAL_PAUSE=1 # Initial delay
+MAX_ELAPSED=300 # Maximum duration for any async task
+INITIAL_PAUSE=2 # Initial delay
 BACKOFF=2 # Exponential backoff
 
 TS1=$(date "+%s")
@@ -32,7 +24,7 @@ while [ "${JOB_STATUS}" != "COMPLETE" ]
 do
     TS2=$(date "+%s")
     ELAPSED=$((${TS2} - ${TS1}))
-    JOB_STATUS=$(abaco executions -v ${ACTOR_ID} ${EXEC_ID} | jq -r .result.status)
+    JOB_STATUS=$(abaco executions -v -e ${EXEC_ID} ${ACTOR_ID} | jq -r .result.status)
     if [ "${ELAPSED}" -gt "${MAX_ELAPSED}" ]
     then
         break
@@ -45,7 +37,7 @@ echo " ${ELAPSED} seconds"
 
 if [ "${JOB_STATUS}" == "COMPLETE" ]
 then
-    abaco logs ${ACTOR_ID} ${EXEC_ID}
+    abaco logs -e ${EXEC_ID} ${ACTOR_ID}
     exit 0
 else
     echo "Error or Actor ${ACTOR_ID} couldn't process message"

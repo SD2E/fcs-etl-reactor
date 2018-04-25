@@ -1,72 +1,39 @@
+"""
+Uses the plan referenced by a manifest to bootstrap an instance of FCS-ETL app
+"""
 import datetime
 import json
 import os
 import sys
+from time import sleep
 from attrdict import AttrDict
-import reactors as Reactor
-from agaveutils import *
-from agavedb import AgaveKeyValStore
+from reactors.utils import Reactor, agaveutils, process
+
+# import datetime
+# import json
+# import os
+# import sys
+# from attrdict import AttrDict
+# import reactors as Reactor
+# from agaveutils import *
+# from agavedb import AgaveKeyValStore
 
 PWD = os.getcwd()
 AGAVE_APP_ALIAS = 'fcs_etl_app'
 
 
-def on_success(successMessage="Success"):
-    '''Boilerplate success function'''
-    Reactor.logger.info(successMessage)
+def on_success(self, successMessage):
+    '''Custom success handler'''
+    self.loggers.slack.info("{}".format(successMessage))
+    self.logger.info("{}".format(successMessage))
     sys.exit(0)
 
 
-def on_failure(failMessage="Failure", exceptionObject=None):
-    '''Boilerplate failure function'''
-    Reactor.logger.critical("{} : {}".format(failMessage, exceptionObject))
+def on_failure(self, failMessage, exceptionObject):
+    '''Custom failure handler'''
+    self.loggers.slack.critical("{} : {}".format(failMessage, exceptionObject))
+    self.logger.critical("{} : {}".format(failMessage, exceptionObject))
     sys.exit(1)
-
-
-def id_from_alias(alias, databaseHandle=None, localOnly=True, timeOut=5):
-    """
-    Given a text alias, return its actor ID
-
-    Consults config.yml/reactors/ALIAS then org.sd2e.alias.ALIAS
-    Returns None on failure to resolve alias to any actor ID.
-
-    Note: This is a prototype function that will eventually move
-    into reactors.aliases when we've shaken the bugs out.
-    """
-
-    assert alias is not None, "'alias' parameter cannot be empty"
-
-    _reactors = AttrDict({})
-    try:
-        if 'reactors' in Reactor.settings:
-            _reactors = _reactors + AttrDict(
-                Reactor.settings.get('reactors', {}))
-    except Exception as e:
-        raise Exception(
-            "No reactor aliases defined in config: {}".format(e))
-        pass
-
-    try:
-        _id = _reactors.get(alias, None)
-        if _id is not None:
-            return _id
-    except Exception as e:
-        raise Exception(
-            "No alias '{}' was found in config: {}".format(alias, e))
-        pass
-
-    if databaseHandle is not None:
-        try:
-            _id = Reactor.aliases.get_alias(databaseHandle, alias)
-            if _id is not None:
-                Reactor.logger.debug("Resolved {} to {}".format(alias, _id))
-                return _id
-        except Exception as e:
-            raise Exception(
-                "No alias '{}' was found in the database: {}".format(alias, e))
-            pass
-
-    return None
 
 
 def sample_to_URI(plan,sample,base='http://hub.sd2e.org/user/nicholasroehner/rule_30',version='1'):
@@ -107,7 +74,7 @@ def extract_experimental_data(manifest, plan):
     experimental_data = {}
     samples = []
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        samples.extend([{'file': file_and_parent(f['file']), 
+        samples.extend([{'file': file_and_parent(f['file']),
                          'sample': sample_to_URI(plan, sample['sample'])} for f in sample['files'] if 'beadcontrol' not in sample['sample']])
     experimental_data['tasbe_experimental_data'] = {'samples': samples, 'rdf:about': manifest['rdf:about']}
     return experimental_data
@@ -203,7 +170,7 @@ def build_color_model(channels):
         "_comment5": "Other processing parameters, to be exposed",
         "tasbe_config": {
           "gating": {
-            "type": "auto", 
+            "type": "auto",
             "k_components": 2
           },
           "autofluorescence": {
@@ -253,7 +220,7 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
                     if sample['sample'] == blank_sample:
                         blank_file = file_and_parent(sample['files'][0]['file'])
                         break
-                break # Should only be one blank/negative control file, until we're handling multiple channels, at which point we'll need more data to know which is which. 
+                break # Should only be one blank/negative control file, until we're handling multiple channels, at which point we'll need more data to know which is which.
 
     positive_control_files = [''] * len(channels)
 
@@ -270,7 +237,7 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
 
         "_comment3": "identifier linking to the instrument and optical configuration used for collecting data",
         "cyometer_configuration": "''' + cytometer_configuration_file_URI + '''",
-    
+
         "_comment4": "all files are URIs to the location of a file on the TA4 infrastructure",
         "bead_file": "''' + bead_file + '''",
         "_comment5": "name of the type of beads being used; must match an entry in the TASBE bead catalog https://github.com/TASBE/TASBEFlowAnalytics/blob/master/code/BeadCatalog.xlsx",
@@ -304,94 +271,131 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
 
 def main():
 
-    if os.environ.get('LOCALONLY', None) is not None:
-        Reactor.logger.warning("Running in local emulation mode. Caveat emptor.")
+    r = Reactor()
+    m = AttrDict(r.context.message_dict)
+    # Look up my own name
+    actor_name = r.get_attr('name')
+    # example:
+    # 'bob' 'was unable to call' 'karen' (id: ABCDEX, exec: BCDEG)
+    template = "{} {} {} (actor/exec {} {})"
+    # override on_failure and on_success
+    funcType = type(r.on_failure)
+    r.on_failure = funcType(on_failure, r, Reactor)
+    funcType = type(r.on_success)
+    r.on_success = funcType(on_success, r, Reactor)
 
-    ag = Reactor.client  # Agave client
+    r.logger.debug("message: {}".format(m))
+    # Use JSONschema-based message validator
+    # - In theory, this obviates some get() boilerplate
+    if not r.validate_message(m):
+        r.on_failure(template.format(
+            actor_name, 'got an invalid message', m, r.uid, r.execid), None)
+
+    ag = r.client  # Agave client
     # db = AgaveKeyValStore(ag)  # AgaveDB client
-    context = Reactor.context  # Actor context
+    context = r.context  # Actor context
     m = context.message_dict
 
-    Reactor.logger.debug("Message: {}".format(m))
+    r.logger.debug("Message: {}".format(m))
 
     agave_uri = m.get('uri')
-    agaveStorageSystem, agaveAbsDir, agaveFileName = from_agave_uri(agave_uri)
-    manifestPath = os.path.join('/', agaveAbsDir, agaveFileName)
+    (agave_storage_sys, agave_abs_dir, agave_filename) =\
+        agaveutils.from_agave_uri(agave_uri)
+    manifest_path = os.path.join('/', agave_abs_dir, agave_filename)
 
-    Reactor.logger.info(
-        "Fetching manifest {}".format(
-            to_agave_uri(agaveStorageSystem, manifestPath)))
+    r.logger.debug("fetching manifest {}".format(agave_uri))
 
     try:
-        mani_file = agave_download_file(agaveClient=ag,
-                                        agaveAbsolutePath=manifestPath,
-                                        systemId=agaveStorageSystem,
-                                        localFilename='manifest.json')
+        mani_file = agaveutils.agave_download_file(
+            agaveClient=r.client,
+            agaveAbsolutePath=manifest_path,
+            systemId=agave_storage_sys,
+            localFilename='manifest.json')
+
         if mani_file is None:
-            on_failure("Unable to retrieve {}".format(
-                to_agave_uri(agaveStorageSystem, agaveRelPath)))
+            raise Exception("no error was detected but file appears empty")
 
     except Exception as e:
-        on_failure("Unable to retrieve {}: {}".format(
-            to_agave_uri(agaveStorageSystem, manifestPath), e))
+        r.on_failure(template.format(
+            actor_name, 'failed to download',
+            manifest_path, r.uid, r.execid), e)
 
     # Load manifest so we can read the plan and config
     # - Use AttrDict so we can use dot.notation
+    r.logger.debug("loading manifest into a dict and getting values")
     manifest_dict = {}
-    plan_uri = None
-    instrument_config_uri = None
     try:
-        with open(mani_file) as json_data:
+        with open('manifest.json') as json_data:
             manifest_dict = AttrDict(json.load(json_data))
             plan_uri = manifest_dict.plan
             instrument_config_uri = manifest_dict.instrument_configuration
     except Exception as e:
-        on_failure(
-            "Failed to read values from {}: {}".format(mani_file, e))
+        r.on_failure(template.format(
+            actor_name, 'was unable to properly parse the',
+            'manifest file', r.uid, r.execid), e)
 
+    r.logger.debug("fetching plan {}".format(plan_uri))
+    plan_abs_path = None
     try:
-        plan_system, plan_dirpath, plan_filename = from_agave_uri(plan_uri)
+        (plan_system, plan_dirpath, plan_filename) =\
+            agaveutils.from_agave_uri(plan_uri)
         plan_abs_path = os.path.join(plan_dirpath, plan_filename)
-        plan_file = agave_download_file(agaveClient=ag,
-                                        agaveAbsolutePath=plan_abs_path,
-                                        systemId=plan_system,
-                                        localFilename='plan.json')
+        plan_file = agaveutils.agave_download_file(
+            agaveClient=r.client,
+            agaveAbsolutePath=plan_abs_path,
+            systemId=plan_system,
+            localFilename='plan.json')
     except Exception as e:
-        on_failure(
-            "Failed to retrieve plan file {} specified in manifest: {}".format(
-                plan_uri, e))
+        r.on_failure(template.format(
+            actor_name, 'failed to download',
+            plan_abs_path, r.uid, r.execid), e)
 
+    r.logger.debug("fetching instrument config {}".format(instrument_config_uri))
     try:
-        ic_system, ic_dirpath, ic_filename = from_agave_uri(instrument_config_uri)
+        (ic_system, ic_dirpath, ic_filename) = \
+            agaveutils.from_agave_uri(instrument_config_uri)
         ic_abs_path = os.path.join(ic_dirpath, ic_filename)
-        ic_file = agave_download_file(agaveClient=ag,
-                                      agaveAbsolutePath=ic_abs_path,
-                                      systemId=ic_system,
-                                      localFilename='cytometer_configuration.json')
+        ic_file = agaveutils.agave_download_file(
+            agaveClient=r.client,
+            agaveAbsolutePath=ic_abs_path,
+            systemId=ic_system,
+            localFilename='cytometer_configuration.json')
     except Exception as e:
-        on_failure(
-            "Failed to retrieve cytometer_configuration {} from manifest: {}".format(
-                instrument_config_uri, e))
+        r.on_failure(template.format(
+            actor_name, 'failed to download',
+            ic_abs_path, r.uid, r.execid), e)
 
+    r.logger.debug("loading dict from instrument config file {}".format(ic_file))
     try:
         cytometer_configuration = json.load(open(ic_file, 'rb'))
     except Exception as e:
-        on_failure("Couldn't load {} as JSON: {}".format(ic_file, e))
+        r.on_failure(template.format(
+            actor_name, 'could not load dict from JSON document',
+            ic_file, r.uid, r.execid), e)
 
+    r.logger.debug("loading tasbe_cytometer_configuration.channels")
     try:
         channels = cytometer_configuration['tasbe_cytometer_configuration']['channels']
     except Exception as e:
-        on_failure("Failed to load channels: {}".format(e))
+        r.on_failure(template.format(
+            actor_name, 'was unable to load',
+            'tasbe_cytometer_configuration.channels from settings',
+            r.uid, r.execid), e)
 
+    r.logger.debug("loading dict from plan JSON file {}".format(plan_file))
     try:
         plan = json.load(open(plan_file, 'rb'))
     except Exception as e:
-        on_failure("Couldn't load {} as JSON: {}".format(plan_file, e))
+        r.on_failure(template.format(
+            actor_name, 'could not load dict from JSON document',
+            plan_file, r.uid, r.execid), e)
 
+    r.logger.debug("writing experimental data to local storage")
     experimental_data = extract_experimental_data(manifest_dict, plan)
     with open('experimental_data.json', 'wb') as outfile:
         json.dump(experimental_data, outfile, sort_keys=True,indent=4,separators=(',', ': '))
 
+    r.logger.debug("writing intermediary JSON files to local storage")
     try:
         with open('process_control_data.json', 'wb') as outfile:
             json.dump(build_process_control_data(plan, channels, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
@@ -400,8 +404,9 @@ def main():
         with open('analysis_parameters.json', 'wb') as outfile:
             json.dump(build_analysis_parameters(), outfile, sort_keys=True,indent=4,separators=(',', ': '))
     except Exception as e:
-        on_failure(
-            "Failed to write intermediary JSON files to storage: {}".format(e))
+        r.on_failure(template.format(
+            actor_name, 'could not load write JSON file(s)',
+            plan_file, r.uid, r.execid), e)
 
     # We will now upload the completed files to:
     # agave://data-sd2e-community/temp/flow_etl/REACTOR_NAME/PLAN_ID
@@ -421,56 +426,55 @@ def main():
     plan_id = os.path.splitext(plan_uri_file)[0]
     # Default upload destination set in config.yml
     # - may want to add override but not essential now
-    dest_dir = os.path.join(Reactor.settings.destination.base_path, plan_id)
-    dest_sys = Reactor.settings.destination.system_id
+    dest_dir = os.path.join(r.settings.destination.base_path, plan_id)
+    dest_sys = r.settings.destination.system_id
 
-    Reactor.logger.info(
-        "Ensuring {} exists".format(to_agave_uri(dest_sys, dest_dir)))
+    r.logger.debug("ensuring destination {} exists".format(
+        agaveutils.to_agave_uri(dest_sys, dest_dir)))
     try:
-        agave_mkdir(ag, plan_id, dest_sys,
-                    Reactor.settings.destination.base_path)
+        agaveutils.agave_mkdir(r.client, plan_id, dest_sys,
+                               r.settings.destination.base_path)
     except Exception as e:
-        on_failure(
-            "Path {} was unavailable: {}".format(
-                to_agave_uri(dest_sys, dest_dir), e))
+        r.on_failure(template.format(
+            actor_name, 'could not access or create destination',
+            dest_dir, r.uid, r.execid), e)
 
     job_def_inputs = {}
     for agaveparam, fname in datafiles.items():
-        Reactor.logger.info(
-            "Uploading {} to {}".format(
-                fname, to_agave_uri(dest_sys, dest_dir)))
+        r.logger.info("uploading {} to {}".format(fname, dest_dir))
         fpath = os.path.join(PWD, fname)
 
         # rename the remote if it exists
         try:
-            Reactor.logger.info("Renaming remote {}".format(fname))
-            remote_abs_path = os.path.join(
-                dest_dir, fname)
+            r.logger.debug("renaming remote {}".format(fname))
+            remote_abs_path = os.path.join(dest_dir, fname)
             new_name = os.path.basename(remote_abs_path) + \
                 '.' + str(int(datetime.datetime.now().strftime("%s")) * 1000)
-            ag.files.manage(systemId=dest_sys,
-                            body={'action': 'rename',
-                                  'path': new_name},
-                            filePath=remote_abs_path)
-        except Exception as e:
-            Reactor.logger.info("{} not on {}. Ignoring error {}".format(
-                remote_abs_path, dest_sys, e))
+            r.client.files.manage(systemId=dest_sys,
+                                  body={'action': 'rename',
+                                        'path': new_name},
+                                  filePath=remote_abs_path)
+        except Exception:
+            r.logger.debug("{} does not exist or is inaccessible. ({})".format(
+                remote_abs_path, 'ignoring error'))
             pass
 
         # upload the newly-generated file
         try:
-            agave_upload_file(ag, dest_dir,
-                              dest_sys, fpath)
+            r.logger.debug("now uploading {}".format(fname))
+            agaveutils.agave_upload_file(r.client, dest_dir, dest_sys, fpath)
         except Exception as e:
-            on_failure("Error uploading {}: {}".format(fname, e))
+            prefix = '{} failed to upload {}'.format(actor_name, fname)
+            r.on_failure(template.format(prefix, 'to', dest_dir,
+                                         r.uid, r.execid), e)
 
-        # This dict is needed to submit the FCS-ETL job later
-        job_def_inputs[agaveparam] = to_agave_uri(
+        # Entries in this dict are needed to submit the FCS-ETL job later
+        job_def_inputs[agaveparam] = agaveutils.to_agave_uri(
             dest_sys, os.path.join(dest_dir, fname))
 
     # Base inputPath off path of manifest
     # Cowboy coding - Take grandparent directory sans sanity checking!
-    manifestPathGrandparent = os.path.dirname(os.path.dirname(manifestPath))
+    manifest_pathGrandparent = os.path.dirname(os.path.dirname(manifest_path))
 
     # Build the inputData path from settings (instead of hard-coding vals)
     #
@@ -481,9 +485,9 @@ def main():
     #   job's runner script but possible and documented.
 
     inputDataPath = os.path.join(
-        manifestPathGrandparent, Reactor.settings.job_params.data_subdir)
-    job_def_inputs['inputData'] = to_agave_uri(
-        agaveStorageSystem, inputDataPath)
+        manifest_pathGrandparent, r.settings.job_params.data_subdir)
+    job_def_inputs['inputData'] = agaveutils.to_agave_uri(
+        agave_storage_sys, inputDataPath)
 
     # Submit a job request to the FCS-ETL app based on template + vars
     #
@@ -498,35 +502,49 @@ def main():
     # itself) are included in the template, but can be over-ridden
     # programmatically with Python dict operations
 
-    job_def = Reactor.settings.job_definition
+    job_def = r.settings.job_definition
+    app_record = r.settings.linked_reactors.get(AGAVE_APP_ALIAS, {})
 
-    # Optionally, override the job_def.appId with an Reactors.alias
-    # Key name for this alias is defined at the top of the file in
-    # AGAVE_APP_ALIAS and only needs to be a URL-safe string < 32
-    # characters in length
-    db = AgaveKeyValStore(ag)
-    try:
-        app_id = id_from_alias('fcs_etl_app', db)
-        if app_id is not None:
-            job_def.appId = app_id
-            Reactor.logger.info(
-                "Agave App ID: {}".format(job_def.appId))
-    except Exception as e:
-        Reactor.logger.info(
-            "Failed to retrieve alias {}. Defaulting to {}".format(
-                AGAVE_APP_ALIAS, job_def.appId))
-        pass
+    # this allows the appId to be set in the job_definition, but overridden
+    # by configuration provided in settings.
+    job_def_orig_appId = job_def.get('appId', None)
+    job_def.appId = app_record.get('id', job_def_orig_appId)
+
+    # add dynamically-generated callback to log aggregator
+    # sends gross amounts of JSON in each POST
+    if r.settings.logs.get('token', None) is not None:
+
+        proto = r.settings.get('logger', {}).get('proto', 'http')
+        hostname = r.settings.get('logger', {}).get('host', 'localhost')
+        port = str(r.settings.get('logger', {}).get('port', 8080))
+        client_key = r.settings.get('logger', {}).get('client_key', 'KEY')
+        client_secret = r.settings.logs.get('token', 'SECRET')
+        # read loggger path from default -> reactor settings -> app settings
+        path = r.settings.get('logger', {}).get('path', '/logger')
+        path = app_record.get('opts', {}).get('logger', {}).get('path', path)
+
+        logger_uri = proto + '://' + client_key + ':' + client_secret + '@' +\
+            hostname + ':' + port + path + '/' + job_def.appId
+
+        logger_callback = {'persistent': True,
+                           'event': '*',
+                           'url': logger_uri}
+
+        nlist = list(job_def.notifications)
+        nlist.append(logger_callback)
+        ntuple = tuple(nlist)
+        job_def.notifications = ntuple
 
     job_def.inputs = job_def_inputs
     job_def.name = "{}-{}".format(
-        Reactor.context.actor_id,
-        Reactor.context.execution_id)
+        r.uid,
+        r.execid)
     # set archivePath and archiveSystem based on manifest
-    job_def.archiveSystem = agaveStorageSystem
+    job_def.archiveSystem = agave_storage_sys
     job_def.archivePath = os.path.join(
-        manifestPathGrandparent, Reactor.settings.job_params.output_subdir,
+        manifest_pathGrandparent, r.settings.job_params.output_subdir,
         job_def.appId, "{}-{}".format(
-            Reactor.context.actor_id, Reactor.context.execution_id))
+            r.uid, r.execid))
 
     # Expected outcome:
     #
@@ -534,21 +552,28 @@ def main():
     # has (at present) directories of measurements and one or more
     # manifests (allowing for versioning). ETL apps can deposit results
     # under ABCDEF/processed/appid/<unique-directory-name>.
+    r.logger.info('submitting FSC-ETL agave compute job')
+    job_id = 'mockup'
+    try:
+        job_id = r.client.jobs.submit(body=job_def)['id']
+        r.logger.info("compute job id is {}".format(job_id))
+    except Exception as e:
+        # Use a print here so we can more easily snag the job def
+        # TODO - come back and take this out if we ever add a nonce to
+        #        the callback notifications because that should not
+        #        show up in the logs. One alternative would be to
+        #        register a plaintext log formatter with redaction
+        #        support, but that requires extending our logger module
+        print(json.dumps(job_def, indent=4))
+        r.on_failure(template.format(
+            actor_name, 'failed when submitting an agave compute job for',
+            job_def.appId, r.uid, r.execid), e)
 
-    if os.environ.get('LOCALONLY', None) is None:
-
-        try:
-            job_id = ag.jobs.submit(body=job_def)['id']
-        except Exception as e:
-            # Use a print here so we can more easily snag the job def
-            print(json.dumps(job_def, indent=4))
-            on_failure(
-                "Failed to submit Agave job: {}".format(e))
-
-        Reactor.logger.info("Submitted Agave job {}".format(job_id))
-
-        Reactor.logger.info(
-            "If you can read this we have succeeded entirely")
+    # Make a nice human-readable success message for the Slack log
+    suffix = '{} and will deposit outputs in {}'.format(
+        job_id, job_def.archivePath)
+    r.on_success(template.format(actor_name, 'submitted job',
+                                 suffix, r.uid, r.execid))
 
 
 if __name__ == '__main__':
