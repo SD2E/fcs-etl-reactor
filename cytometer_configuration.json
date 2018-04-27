@@ -1,0 +1,48 @@
+{
+	"_comment1" : "Persistent information the UW BIOFAB Accuri flow cytometer",
+	"tasbe_cytometer_configuration": {
+		"_comment1": "the rdf:about field is a URI that persistently identifies this instrument and optical configuration",
+		"rdf:about": "agave://data-sd2e-community/sample/biofab/instruments/accuri/5539/11272017/cytometer_configuration.json",
+
+		"_comment2": "Compatible TASBE interface version, following Semantic Versioning (semver.org).  Note that underspecifying version allows use of backward compatible upgrades.",
+		"tasbe_version": "https://github.com/SD2E/reactors-etl/releases/tag/2",
+
+		"_comment3": "the channels for the instrument are fixed",
+		"channels": [{
+			"name": "FL1-A",
+			"excitation_wavelength": 488,
+			"emission_filter": {
+				"type":"bandpass",
+				"center": 533,
+				"width": 30
+			}
+		},
+		{
+			"name": "FL2-A",
+			"excitation_wavelength": 488,
+			"emission_filter": {
+				"type":"bandpass",
+				"center": 585,
+				"width": 40
+			}
+		},
+		{
+			"name":"FL3-A",
+			"excitation_wavelength":488,
+			"emission_filter": {
+				"type":"longpass",
+				"cutoff":670
+			}
+		},
+		{
+			"name": "FL4-A",
+			"excitation_wavelength": 640,
+			"emission_filter": {
+				"type":"bandpass",
+				"center":675,
+				"width":25
+			}
+		}
+		]
+	}
+}

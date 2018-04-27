@@ -1,0 +1,371 @@
+{
+    "tasbe_experimental_data": {
+        "rdf:about": "agave://data-sd2e-community/biofab/yeast-gates_q0/aq_10545/3/manifest/manifest.json",
+        "samples": [
+            {
+                "file": "instrument_output/s906.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s906/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4668_R25552_R25730.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4668_R25552_R25730/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4613_R25513_R25755.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4613_R25513_R25755/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4564_R25465_R25780.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4564_R25465_R25780/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4521_R25408_R25805.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4521_R25408_R25805/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4484_R25342_R25830.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4484_R25342_R25830/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4453_R25267_R25855.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4453_R25267_R25855/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4398_R25183_R25880.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4398_R25183_R25880/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4349_R25090_R25905.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4349_R25090_R25905/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4306_R24988_R25930.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4306_R24988_R25930/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4269_R24877_R25955.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4269_R24877_R25955/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4238_R24757_R25980.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4238_R24757_R25980/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4183_R24628_R26005.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4183_R24628_R26005/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4134_R24490_R26030.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4134_R24490_R26030/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4091_R24343_R26055.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4091_R24343_R26055/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4054_R24187_R26080.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4054_R24187_R26080/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4023_R24022_R26105.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4023_R24022_R26105/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3968_R23848_R26130.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3968_R23848_R26130/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3919_R23665_R26155.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3919_R23665_R26155/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3876_R23473_R26180.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3876_R23473_R26180/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3839_R23272_R26205.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3839_R23272_R26205/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3808_R23062_R26230.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3808_R23062_R26230/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3753_R22843_R26255.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3753_R22843_R26255/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3704_R22615_R26280.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3704_R22615_R26280/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3661_R22378_R26305.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3661_R22378_R26305/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3624_R22132_R26330.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3624_R22132_R26330/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3593_R21877_R26355.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3593_R21877_R26355/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3538_R21613_R26380.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3538_R21613_R26380/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3489_R21340_R26405.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3489_R21340_R26405/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3446_R21058_R26430.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3446_R21058_R26430/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3409_R20767_R26455.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3409_R20767_R26455/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4668_R20467_R26480.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4668_R20467_R26480/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4613_R20428_R26505.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4613_R20428_R26505/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4564_R20380_R26530.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4564_R20380_R26530/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4521_R20323_R26555.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4521_R20323_R26555/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4484_R20257_R26580.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4484_R20257_R26580/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4453_R20182_R26605.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4453_R20182_R26605/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4398_R20098_R26630.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4398_R20098_R26630/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4349_R20005_R26655.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4349_R20005_R26655/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4306_R19903_R26680.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4306_R19903_R26680/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4269_R19792_R26705.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4269_R19792_R26705/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4238_R19672_R26730.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4238_R19672_R26730/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4183_R19543_R26755.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4183_R19543_R26755/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4134_R19405_R26780.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4134_R19405_R26780/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4091_R19258_R26805.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4091_R19258_R26805/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4054_R19102_R26830.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4054_R19102_R26830/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4023_R18937_R26855.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4023_R18937_R26855/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3968_R18763_R26880.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3968_R18763_R26880/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3919_R18580_R26905.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3919_R18580_R26905/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3876_R18388_R26930.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3876_R18388_R26930/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3839_R18187_R26955.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3839_R18187_R26955/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3808_R17977_R26980.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3808_R17977_R26980/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3753_R17758_R27005.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3753_R17758_R27005/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3704_R17530_R27030.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3704_R17530_R27030/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3661_R17293_R27055.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3661_R17293_R27055/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3624_R17047_R27080.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3624_R17047_R27080/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3593_R16792_R27105.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3593_R16792_R27105/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3538_R16528_R27130.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3538_R16528_R27130/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3489_R16255_R27155.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3489_R16255_R27155/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3446_R15973_R27180.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3446_R15973_R27180/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3409_R15682_R27205.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3409_R15682_R27205/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4668_R15382_R27230.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4668_R15382_R27230/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4613_R15343_R27255.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4613_R15343_R27255/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4564_R15295_R27280.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4564_R15295_R27280/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4521_R15238_R27305.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4521_R15238_R27305/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4484_R15172_R27330.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4484_R15172_R27330/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4453_R15097_R27355.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4453_R15097_R27355/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4398_R15013_R27380.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4398_R15013_R27380/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4349_R14920_R27405.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4349_R14920_R27405/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4306_R14818_R27430.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4306_R14818_R27430/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4269_R14707_R27455.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4269_R14707_R27455/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4238_R14587_R27480.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4238_R14587_R27480/1"
+            },
+            {
+                "file": "instrument_output/s2367_R4183_R14458_R27505.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R4183_R14458_R27505/1"
+            },
+            {
+                "file": "instrument_output/s2391_R4134_R14320_R27530.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R4134_R14320_R27530/1"
+            },
+            {
+                "file": "instrument_output/s2415_R4091_R14173_R27555.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R4091_R14173_R27555/1"
+            },
+            {
+                "file": "instrument_output/s2439_R4054_R14017_R27580.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R4054_R14017_R27580/1"
+            },
+            {
+                "file": "instrument_output/s2341_R4023_R13852_R27605.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R4023_R13852_R27605/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3968_R13678_R27630.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3968_R13678_R27630/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3919_R13495_R27655.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3919_R13495_R27655/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3876_R13303_R27680.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3876_R13303_R27680/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3839_R13102_R27705.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3839_R13102_R27705/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3808_R12892_R27730.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3808_R12892_R27730/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3753_R12673_R27755.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3753_R12673_R27755/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3704_R12445_R27780.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3704_R12445_R27780/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3661_R12208_R27805.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3661_R12208_R27805/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3624_R11962_R27830.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3624_R11962_R27830/1"
+            },
+            {
+                "file": "instrument_output/s2341_R3593_R11707_R27855.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2341_R3593_R11707_R27855/1"
+            },
+            {
+                "file": "instrument_output/s2367_R3538_R11443_R27880.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2367_R3538_R11443_R27880/1"
+            },
+            {
+                "file": "instrument_output/s2391_R3489_R11170_R27905.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2391_R3489_R11170_R27905/1"
+            },
+            {
+                "file": "instrument_output/s2415_R3446_R10888_R27930.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2415_R3446_R10888_R27930/1"
+            },
+            {
+                "file": "instrument_output/s2439_R3409_R10597_R27955.fcs",
+                "sample": "https://hub.sd2e.org/user/sd2e/biofab_yeast_gates_q0_aq_10545/s2439_R3409_R10597_R27955/1"
+            }
+        ]
+    }
+}

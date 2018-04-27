@@ -438,10 +438,13 @@ def main():
 
     r.logger.debug("writing intermediary JSON files to local storage")
     try:
+        r.logger.debug('  writing process_control_data')
         with open('process_control_data.json', 'wb') as outfile:
             json.dump(build_process_control_data(channels, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
+        r.logger.debug('  color_model_parameters')
         with open('color_model_parameters.json', 'wb') as outfile:
             json.dump(build_color_model(channels), outfile, sort_keys=True,indent=4,separators=(',', ': '))
+        r.logger.debug('  analysis_parameters')
         with open('analysis_parameters.json', 'wb') as outfile:
             json.dump(build_analysis_parameters(), outfile, sort_keys=True,indent=4,separators=(',', ': '))
     except Exception as e:
