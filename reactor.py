@@ -219,15 +219,17 @@ def build_process_control_data(channels, experimental_data, cytometer_configurat
             bead_file = file_and_parent(sample['files'][0]['file'])
 
     sparql.setQuery("""
-            select distinct ?negative_control where {{ {} <https://hub.sd2e.org/user/sd2e/negative_control> ?negative_control }} LIMIT 100
+select distinct ?negative_uri where {{ {} <https://hub.sd2e.org/user/sd2e/negative_control> ?negative_control .
+?negative_uri <http://www.w3.org/ns/prov#wasDerivedFrom>* ?negative_control}} LIMIT 100
     """.format(plan_uri))
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
-    negative_control_URI = results["results"]["bindings"][0]["negative_control"]["value"]
+    negative_control_URIs = [x["negative_uri"]["value"] for x in results["results"]["bindings"]]
 
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        if sample['sample'] == negative_control_URI:
+        if sample['sample'] in negative_control_URIs:
             negative_control_file = file_and_parent(sample['files'][0]['file'])
+            break #keep the first one
 
     sparql.setQuery("""
 select distinct ?sample ?config_key ?config_val where {{
