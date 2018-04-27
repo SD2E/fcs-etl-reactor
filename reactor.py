@@ -42,7 +42,7 @@ def file_and_parent(filepath):
     return os.path.join(os.path.basename(os.path.dirname(filepath)), os.path.basename(filepath))
 
 
-def extract_experimental_data(manifest, plan):
+def extract_experimental_data(manifest):
     experimental_data = {}
     samples = []
     for sample in [s for s in manifest['samples'] if s['collected']]:
@@ -187,15 +187,15 @@ def build_color_model(channels):
     }''') # Defaulting to first channel for ERF_channel_name; all channels' names will be "GFP"
     return color_model
 
-def build_process_control_data(plan, channels, experimental_data, cytometer_configuration_file_URI, manifest):
-    plan_URI = '<' + plan['id'] + '>'
+def build_process_control_data(channels, experimental_data, cytometer_configuration_file_URI, manifest):
+    plan_uri = '<' + manifest['plan'] + '>'
     #get bead_model and bead_batch from SBH based on bead_URI
     host = 'https://hub-api.sd2e.org/sparql'
     sparql = SPARQLWrapper(host)
 
     sparql.setQuery("""
             select distinct ?sample where {{ {} <https://hub.sd2e.org/user/sd2e/bead_control> ?sample }} LIMIT 100
-    """.format(plan_URI))
+    """.format(plan_uri))
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     bead_URI = results["results"]["bindings"][0]["sample"]["value"]
@@ -214,34 +214,19 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
     results = sparql.query().convert()
     bead_model = results["results"]["bindings"][0]["model"]["value"]
 
-    bead_file_URI = 'UNKNOWN'
-    for step in plan['steps']:
-        if step.get('operator', {}).get('type', '') == 'flowCytometry':
-            for measurement in step.get('operator', {}).get('measurements', []):
-                if measurement.get('source', '') == bead_URI:
-                    bead_file_URI = measurement.get('file', 'UNKNOWN')
-    
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        if sample['sample'] == bead_file_URI:
+        if sample['sample'] == bead_URI:
             bead_file = file_and_parent(sample['files'][0]['file'])
-
 
     sparql.setQuery("""
             select distinct ?negative_control where {{ {} <https://hub.sd2e.org/user/sd2e/negative_control> ?negative_control }} LIMIT 100
-    """.format(plan_URI))
+    """.format(plan_uri))
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     negative_control_URI = results["results"]["bindings"][0]["negative_control"]["value"]
 
-    negative_control_file_URI = 'UNKNOWN'
-    for step in plan['steps']:
-        if step.get('operator', {}).get('type', '') == 'flowCytometry':
-            for measurement in step.get('operator', {}).get('measurements', []):
-                if measurement.get('source', '') == negative_control_URI:
-                    negative_control_file_URI = measurement.get('file', 'UNKNOWN')
-    
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        if sample['sample'] == negative_control_file_URI:
+        if sample['sample'] == negative_control_URI:
             negative_control_file = file_and_parent(sample['files'][0]['file'])
 
     sparql.setQuery("""
@@ -250,7 +235,7 @@ select distinct ?sample ?config_key ?config_val where {{
 ?sample <https://hub.sd2e.org/user/sd2e/positive_control_channel_config> ?channel_config .
 ?channel_config ?config_key ?config_val
 }} ORDER BY ?sample
-""".format(plan_URI))
+""".format(plan_uri))
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
     positive_control_data = results["results"]["bindings"]
@@ -388,21 +373,21 @@ def main():
             actor_name, 'was unable to properly parse the',
             'manifest file', r.uid, r.execid), e)
 
-    r.logger.debug("fetching plan {}".format(plan_uri))
-    plan_abs_path = None
-    try:
-        (plan_system, plan_dirpath, plan_filename) =\
-            agaveutils.from_agave_uri(plan_uri)
-        plan_abs_path = os.path.join(plan_dirpath, plan_filename)
-        plan_file = agaveutils.agave_download_file(
-            agaveClient=r.client,
-            agaveAbsolutePath=plan_abs_path,
-            systemId=plan_system,
-            localFilename='plan.json')
-    except Exception as e:
-        r.on_failure(template.format(
-            actor_name, 'failed to download',
-            plan_abs_path, r.uid, r.execid), e)
+#     r.logger.debug("fetching plan {}".format(plan_uri))
+#     plan_abs_path = None
+#     try:
+#         (plan_system, plan_dirpath, plan_filename) =\
+#             agaveutils.from_agave_uri(plan_uri)
+#         plan_abs_path = os.path.join(plan_dirpath, plan_filename)
+#         plan_file = agaveutils.agave_download_file(
+#             agaveClient=r.client,
+#             agaveAbsolutePath=plan_abs_path,
+#             systemId=plan_system,
+#             localFilename='plan.json')
+#     except Exception as e:
+#         r.on_failure(template.format(
+#             actor_name, 'failed to download',
+#             plan_abs_path, r.uid, r.execid), e)
 
     r.logger.debug("fetching instrument config {}".format(instrument_config_uri))
     try:
@@ -436,31 +421,32 @@ def main():
             'tasbe_cytometer_configuration.channels from settings',
             r.uid, r.execid), e)
 
-    r.logger.debug("loading dict from plan JSON file {}".format(plan_file))
-    try:
-        plan = json.load(open(plan_file, 'rb'))
-    except Exception as e:
-        r.on_failure(template.format(
-            actor_name, 'could not load dict from JSON document',
-            plan_file, r.uid, r.execid), e)
+#     r.logger.debug("loading dict from plan JSON file {}".format(plan_file))
+#     try:
+#         plan = json.load(open(plan_file, 'rb'))
+#     except Exception as e:
+#         r.on_failure(template.format(
+#             actor_name, 'could not load dict from JSON document',
+#             plan_file, r.uid, r.execid), e)
 
     r.logger.debug("writing experimental data to local storage")
-    experimental_data = extract_experimental_data(manifest_dict, plan)
+    experimental_data = extract_experimental_data(manifest_dict)
     with open('experimental_data.json', 'wb') as outfile:
         json.dump(experimental_data, outfile, sort_keys=True,indent=4,separators=(',', ': '))
 
     r.logger.debug("writing intermediary JSON files to local storage")
     try:
         with open('process_control_data.json', 'wb') as outfile:
-            json.dump(build_process_control_data(plan, channels, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
+            json.dump(build_process_control_data(channels, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
         with open('color_model_parameters.json', 'wb') as outfile:
             json.dump(build_color_model(channels), outfile, sort_keys=True,indent=4,separators=(',', ': '))
         with open('analysis_parameters.json', 'wb') as outfile:
             json.dump(build_analysis_parameters(), outfile, sort_keys=True,indent=4,separators=(',', ': '))
     except Exception as e:
-        r.on_failure(template.format(
-            actor_name, 'could not load write JSON file(s)',
-            plan_file, r.uid, r.execid), e)
+        #Matt, we don't have plan_file any more - what should this be?
+#         r.on_failure(template.format(
+#             actor_name, 'could not load write JSON file(s)',
+#             plan_file, r.uid, r.execid), e)
 
     # We will now upload the completed files to:
     # agave://data-sd2e-community/temp/flow_etl/REACTOR_NAME/PLAN_ID
@@ -475,6 +461,7 @@ def main():
 
     # Figure out the plan_id from plan_uri
     # - Get the JSON file
+    #Matt, again, no plan/plan_uri/plan_file, how else should we determine dest_dir and dest_sys? We can get the SBH URI plan_id if needed, not sure if that's relevant. In fact, we already have it in plan_uri.
     plan_uri_file = os.path.basename(plan_uri)
     # - Get JSON filename root
     plan_id = os.path.splitext(plan_uri_file)[0]
