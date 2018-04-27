@@ -198,7 +198,7 @@ def build_process_control_data(channels, experimental_data, cytometer_configurat
     """.format(plan_uri))
     sparql.setReturnFormat(JSON)
     results = sparql.query().convert()
-    bead_URI = results["results"]["bindings"][0]["sample"]["value"]
+    bead_URI = '<' + results["results"]["bindings"][0]["sample"]["value"] + '>'
 
     sparql.setQuery("""
             select distinct ?batch where {{ {} <https://hub.sd2e.org/user/sd2e/bead_batch> ?batch }} LIMIT 100
