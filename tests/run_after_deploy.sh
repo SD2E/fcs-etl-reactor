@@ -19,3 +19,5 @@ source reactor.rc
 
 abaco share -u ABACO_WORLD -p READ ${ACTOR_ID}
 abaco share -u world -p READ ${ACTOR_ID}
+abaco share -u jed -p UPDATE ${ACTOR_ID}
+abaco share -u gzynda -p UPDATE ${ACTOR_ID}

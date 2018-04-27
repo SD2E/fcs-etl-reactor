@@ -1,5 +1,6 @@
 [{
-    "MSG": {"uri":"agave://data-sd2e-community/ingest/testing/validate-copy-trigger/manifest/manifest.json"},
+    "MSG": {"uri":"agave://data-sd2e-community/ingest/biofab/yeast-gates_q0/aq_10545/3/manifest/manifest.json"},
+    "LOCALONLY": 1,
     "_abaco_Content-Type": "application/json",
     "_abaco_actor_state": {},
     "_abaco_username": "taco",

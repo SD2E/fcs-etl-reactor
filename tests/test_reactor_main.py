@@ -73,4 +73,3 @@ def test_reactor_main(monkeypatch, caplog, capsys,
         r.main()
     assert pytest_wrapped_e.type == SystemExit
     assert pytest_wrapped_e.value.code == 0
-

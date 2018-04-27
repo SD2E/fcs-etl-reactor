@@ -21,7 +21,7 @@ shell:
 	bash tests/run_container_tests.sh bash
 
 tests-local:
-	bash tests/run_container_tests.sh pytest tests -s -vvv
+	bash tests/run_container_tests.sh pytest tests -s -vvv $(PYTESTOPTS)
 
 tests-reactor:
 	bash tests/run_local_message.sh
@@ -38,5 +38,5 @@ trial-deploy:
 deploy:
 	bash tests/run_deploy_with_updates.sh
 
-after:
+postdeploy:
 	bash tests/run_after_deploy.sh
