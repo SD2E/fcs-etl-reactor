@@ -255,12 +255,12 @@ select distinct ?sample ?config_key ?config_val where {{
         chan_name = channels[c]['name']
         pos_cont_samples = [x[1] for x in channel_positive_controls if x[0] == chan_name]
         if len(pos_cont_samples) == 0:
-            positive_control_files[chan_name] = None
+            positive_control_files[chan_name] = "NONE"
             continue
         pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
         if len(pos_cont_files) == 0:
             # we should actually check for the first sample whose file was collected, rather than the first sample.
-            positive_control_files[chan_name] = None
+            positive_control_files[chan_name] = "NONE"
             continue
         positive_control_files[chan_name] = pos_cont_files[0]
 
