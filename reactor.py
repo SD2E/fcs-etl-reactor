@@ -46,7 +46,7 @@ def extract_experimental_data(manifest):
     experimental_data = {}
     samples = []
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        samples.extend([{'file': file_and_parent(f['file']), 
+        samples.extend([{'file': file_and_parent(f['file']),
                          'sample': sample['sample']} for f in sample['files'] if 'beadcontrol' not in sample['sample']])
     experimental_data['tasbe_experimental_data'] = {'samples': samples, 'rdf:about': manifest['rdf:about']}
     return experimental_data
@@ -245,9 +245,9 @@ select distinct ?sample ?config_key ?config_val where {{
       if sample not in positive_controls:
         positive_controls[sample] = {}
       positive_controls[sample][i['config_key']['value']] = i['config_val']['value']
-    
+
     channel_positive_controls = sorted([(find_channel_name(channels, c[1]), c[0]) for c in positive_controls.iteritems()])
-    
+
     positive_control_files = {}
     for c in range(len(channels)):
         chan_name = channels[c]['name']
@@ -261,8 +261,8 @@ select distinct ?sample ?config_key ?config_val where {{
             positive_control_files[chan_name] = None
             continue
         positive_control_files[chan_name] = pos_cont_files[0]
-      
-  
+
+
     #beads and blanks/negative control
     #channel names can come from cytometer config
     process_control_data = json.loads('''{
@@ -444,9 +444,9 @@ def main():
             json.dump(build_analysis_parameters(), outfile, sort_keys=True,indent=4,separators=(',', ': '))
     except Exception as e:
         #Matt, we don't have plan_file any more - what should this be?
-#         r.on_failure(template.format(
-#             actor_name, 'could not load write JSON file(s)',
-#             plan_file, r.uid, r.execid), e)
+        r.on_failure(template.format(
+            actor_name, 'failed to write intermediary JSON file(s).',
+            '', r.uid, r.execid), e)
 
     # We will now upload the completed files to:
     # agave://data-sd2e-community/temp/flow_etl/REACTOR_NAME/PLAN_ID
@@ -459,17 +459,18 @@ def main():
                  'experimentalData': 'experimental_data.json',
                  'processControl': 'process_control_data.json'}
 
-    # Figure out the plan_id from plan_uri
-    # - Get the JSON file
-    #Matt, again, no plan/plan_uri/plan_file, how else should we determine dest_dir and dest_sys? We can get the SBH URI plan_id if needed, not sure if that's relevant. In fact, we already have it in plan_uri.
-    plan_uri_file = os.path.basename(plan_uri)
     # - Get JSON filename root
-    plan_id = os.path.splitext(plan_uri_file)[0]
+    try:
+        plan_id = plan_uri.split(r.settings.destination.plan_root, 1)[1]
+    except Exception as e:
+        r.on_failure(template.format(
+            actor_name, 'was unable to determine plan id',
+            '', r.uid, r.execid), e)
     # Default upload destination set in config.yml
     # - may want to add override but not essential now
     dest_dir = os.path.join(r.settings.destination.base_path, plan_id)
     dest_sys = r.settings.destination.system_id
-
+    r.logger.info("begining to upload json files")
     r.logger.debug("ensuring destination {} exists".format(
         agaveutils.to_agave_uri(dest_sys, dest_dir)))
     try:

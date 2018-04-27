@@ -4,6 +4,7 @@ source:
   system_id: data-sd2e-community
 destination:
   base_path: /temp/flow_etl/launch_fcs_etl_app/
+  plan_root: https://hub.sd2e.org/user/sd2e/experiment/
   system_id: data-sd2e-community
 linked_reactors:
   fcs_etl_app:

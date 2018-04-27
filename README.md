@@ -29,9 +29,9 @@ Broadly...
 
 ```shell
 # test building the container
-make container
+make container NO_CACHE=1
 # run pytests inside the container
-make tests-local PYTESTOPTS=
+make tests-local PYTESTOPTS=""
 # locally simulate running the reactor via message
 make tests-reactor
 # deploy a specially tagged container for testing
