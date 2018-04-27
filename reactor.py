@@ -215,7 +215,7 @@ def build_process_control_data(channels, experimental_data, cytometer_configurat
     bead_model = results["results"]["bindings"][0]["model"]["value"]
 
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        if sample['sample'] == bead_URI:
+        if sample['sample'] == bead_URI[1:-1]: #strip angle brackets
             bead_file = file_and_parent(sample['files'][0]['file'])
 
     sparql.setQuery("""
