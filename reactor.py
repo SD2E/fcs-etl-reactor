@@ -291,7 +291,7 @@ select distinct ?sample ?config_key ?config_val where {{
         },
 
         "_comment7": "the blank file should be wild-type or null transfection",
-        "blank_file": "''' + blank_file + '''",
+        "blank_file": "''' + negative_control_file + '''",
 
         "_comment8": "each channel should have a strong single positive control of the species it quantifies",
         "channels": [''' +
