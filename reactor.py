@@ -8,6 +8,7 @@ import sys
 from time import sleep
 from attrdict import AttrDict
 from reactors.utils import Reactor, agaveutils, process
+from SPARQLWrapper import SPARQLWrapper, JSON
 
 # import datetime
 # import json
@@ -36,35 +37,6 @@ def on_failure(self, failMessage, exceptionObject):
     sys.exit(1)
 
 
-def sample_to_URI(plan,sample,base='http://hub.sd2e.org/user/nicholasroehner/rule_30',version='1'):
-
-    for i in plan['initialState']:
-        if i['Sample Id'] == sample:
-            try:
-                for c in i['Conditions']:
-                    for k in c:
-                        if k == 'IPTG_measure':
-                            iptg = c[k]
-                        if k == 'Larabinose_measure':
-                            ara = c[k]
-                        if k == 'aTc_measure':
-                            atc = str(c[k]).replace('.','p')
-                strains = []
-                for s in i['Strains']:
-                    strains.append(s['Strain Id'].split('#')[-1])
-
-                if len(strains)==1:
-                    strain_string = strains[0]
-                else:
-                    strain_string = 'pAN3928_pAN4036'
-
-                return '{}/{}_system_{}_{}_{}/{}'.format(base,strain_string,ara,atc,iptg,version)
-
-            except KeyError as e:
-                print 'Could not find all metadata for ',sample,e
-                return 'undefined'
-
-
 def file_and_parent(filepath):
     '''Return a file and its parent directory'''
     return os.path.join(os.path.basename(os.path.dirname(filepath)), os.path.basename(filepath))
@@ -74,10 +46,28 @@ def extract_experimental_data(manifest, plan):
     experimental_data = {}
     samples = []
     for sample in [s for s in manifest['samples'] if s['collected']]:
-        samples.extend([{'file': file_and_parent(f['file']),
-                         'sample': sample_to_URI(plan, sample['sample'])} for f in sample['files'] if 'beadcontrol' not in sample['sample']])
+        samples.extend([{'file': file_and_parent(f['file']), 
+                         'sample': sample['sample']} for f in sample['files'] if 'beadcontrol' not in sample['sample']])
     experimental_data['tasbe_experimental_data'] = {'samples': samples, 'rdf:about': manifest['rdf:about']}
     return experimental_data
+
+def find_channel_name(channels, channel_data):
+    if channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/emission_filter_type'] == 'bandpass':
+        type = 'bandpass'
+        center = int(channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/emission_filter_center'])
+        width = int(channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/emission_filter_width'])
+        wavelength = int(channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/excitation_wavelength'])
+        matches = [c['name'] for c in channels if c['excitation_wavelength'] == wavelength and c['emission_filter']['type'] == type and c['emission_filter']['center'] == center and c['emission_filter']['width'] == width]
+        if len(matches) == 1:
+            return matches[0]
+    elif channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/emission_filter_type'] == 'longpass':
+        type = 'longpass'
+        cutoff = int(channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/emission_filter_cutoff'])
+        wavelength = int(channel_data[u'https://hub.sd2e.org/user/sd2e/cytometer_channel/excitation_wavelength'])
+        matches = [c['name'] for c in channels if c['excitation_wavelength'] == wavelength and c['emission_filter']['type'] == type and c['emission_filter']['cutoff'] == cutoff]
+        if len(matches) == 1:
+            return matches[0]
+    return None
 
 
 def build_analysis_parameters():
@@ -198,32 +188,96 @@ def build_color_model(channels):
     return color_model
 
 def build_process_control_data(plan, channels, experimental_data, cytometer_configuration_file_URI, manifest):
-    for state in plan['initialState']:
-        for condition in state.get('Conditions', []):
-            if 'bead_model' in condition:
-                bead_model = condition['bead_model']
-                bead_file_URI = state.get('Sample Id', 'UNKNOWN')
-                bead_batch = condition.get('bead_batch', 'Lot AJ02') # This is a baby bumper for Q0
-                break # Should only be one bead file, until we're handling multiple channels, at which point we'll need more data to know which is which
+    plan_URI = '<' + plan['id'] + '>'
+    #get bead_model and bead_batch from SBH based on bead_URI
+    host = 'https://hub-api.sd2e.org/sparql'
+    sparql = SPARQLWrapper(host)
 
+    sparql.setQuery("""
+            select distinct ?sample where {{ {} <https://hub.sd2e.org/user/sd2e/bead_control> ?sample }} LIMIT 100
+    """.format(plan_URI))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    bead_URI = results["results"]["bindings"][0]["sample"]["value"]
+
+    sparql.setQuery("""
+            select distinct ?batch where {{ {} <https://hub.sd2e.org/user/sd2e/bead_batch> ?batch }} LIMIT 100
+    """.format(bead_URI))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    bead_batch = results["results"]["bindings"][0]["batch"]["value"]
+
+    sparql.setQuery("""
+            select distinct ?model where {{ {} <https://hub.sd2e.org/user/sd2e/bead_model> ?model }} LIMIT 100
+    """.format(bead_URI))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    bead_model = results["results"]["bindings"][0]["model"]["value"]
+
+    bead_file_URI = 'UNKNOWN'
+    for step in plan['steps']:
+        if step.get('operator', {}).get('type', '') == 'flowCytometry':
+            for measurement in step.get('operator', {}).get('measurements', []):
+                if measurement.get('source', '') == bead_URI:
+                    bead_file_URI = measurement.get('file', 'UNKNOWN')
+    
     for sample in [s for s in manifest['samples'] if s['collected']]:
         if sample['sample'] == bead_file_URI:
-            #bead_file = sample['files'][0]['file']
             bead_file = file_and_parent(sample['files'][0]['file'])
 
-    for state in plan['initialState']:
-        for condition in state.get('Conditions', []):
-            if 'Is_Blank' in condition and condition['Is_Blank']==True:
-                blank_sample = state['Sample Id']
-                blank_file = ''
-                for sample in [s for s in manifest['samples'] if s['collected']]:
-                    if sample['sample'] == blank_sample:
-                        blank_file = file_and_parent(sample['files'][0]['file'])
-                        break
-                break # Should only be one blank/negative control file, until we're handling multiple channels, at which point we'll need more data to know which is which.
 
-    positive_control_files = [''] * len(channels)
+    sparql.setQuery("""
+            select distinct ?negative_control where {{ {} <https://hub.sd2e.org/user/sd2e/negative_control> ?negative_control }} LIMIT 100
+    """.format(plan_URI))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    negative_control_URI = results["results"]["bindings"][0]["negative_control"]["value"]
 
+    negative_control_file_URI = 'UNKNOWN'
+    for step in plan['steps']:
+        if step.get('operator', {}).get('type', '') == 'flowCytometry':
+            for measurement in step.get('operator', {}).get('measurements', []):
+                if measurement.get('source', '') == negative_control_URI:
+                    negative_control_file_URI = measurement.get('file', 'UNKNOWN')
+    
+    for sample in [s for s in manifest['samples'] if s['collected']]:
+        if sample['sample'] == negative_control_file_URI:
+            negative_control_file = file_and_parent(sample['files'][0]['file'])
+
+    sparql.setQuery("""
+select distinct ?sample ?config_key ?config_val where {{
+{} <https://hub.sd2e.org/user/sd2e/positive_control> ?sample .
+?sample <https://hub.sd2e.org/user/sd2e/positive_control_channel_config> ?channel_config .
+?channel_config ?config_key ?config_val
+}} ORDER BY ?sample
+""".format(plan_URI))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    positive_control_data = results["results"]["bindings"]
+    positive_controls = {}
+    for i in positive_control_data:
+      sample = i['sample']['value']
+      if sample not in positive_controls:
+        positive_controls[sample] = {}
+      positive_controls[sample][i['config_key']['value']] = i['config_val']['value']
+    
+    channel_positive_controls = sorted([(find_channel_name(channels, c[1]), c[0]) for c in positive_controls.iteritems()])
+    
+    positive_control_files = {}
+    for c in range(len(channels)):
+        chan_name = channels[c]['name']
+        pos_cont_samples = [x[1] for x in channel_positive_controls if x[0] == chan_name]
+        if len(pos_cont_samples) == 0:
+            positive_control_files[chan_name] = None
+            continue
+        pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
+        if len(pos_cont_files) == 0:
+            # we should actually check for the first sample whose file was collected, rather than the first sample.
+            positive_control_files[chan_name] = None
+            continue
+        positive_control_files[chan_name] = pos_cont_files[0]
+      
+  
     #beads and blanks/negative control
     #channel names can come from cytometer config
     process_control_data = json.loads('''{
@@ -258,7 +312,7 @@ def build_process_control_data(plan, channels, experimental_data, cytometer_conf
             "_comment1": "name must match a channel from the cytometer configuration",
             "name": "''' + channels[c]['name'] + '''",
             "_comment2": "FCS file for single positive control",
-            "calibration_file": "''' + positive_control_files[c] + '''"
+            "calibration_file": "''' + positive_control_files[channels[c]['name']] + '''"
           }''' for c in range(len(channels))]) + '''
         ],
 
