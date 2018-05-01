@@ -8,7 +8,7 @@ destination:
   system_id: data-sd2e-community
 linked_reactors:
   fcs_etl_app:
-    id: fcs-etl-0.3.5u1
+    id: sd2eadm-fcs-etl-0.3.5
     opts:
       logger:
         path: /logger/apps
@@ -24,7 +24,7 @@ job_definition:
   inputs: ~
   archiveSystem: ~
   archivePath: ~
-  appId: fcs-etl-0.3.5
+  appId: fcs-etl-0.3.5u1
   batchQueue: normal
   maxRunTime: '00:55:00'
   archive: true
@@ -42,4 +42,4 @@ slack:
   channel: notifications
   webhook: ~
 logger:
-  path: /logger/apps
+  path: /logger/reactors
