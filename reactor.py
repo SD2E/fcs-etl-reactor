@@ -389,12 +389,11 @@ def main():
             'tasbe_cytometer_configuration.channels from settings',
             r.uid, r.execid), e)
 
-    plan_uri = '<' + manifest_dict['plan'] + '>'
     host = 'https://hub-api.sd2e.org/sparql'
     sparql = SPARQLWrapper(host)
     sparql.setQuery("""
 select distinct ?sample ?config_key ?config_val where {{
-{} <https://hub.sd2e.org/user/sd2e/positive_control> ?sample .
+<{}> <https://hub.sd2e.org/user/sd2e/positive_control> ?sample .
 ?sample <https://hub.sd2e.org/user/sd2e/positive_control_channel_config> ?channel_config .
 ?channel_config ?config_key ?config_val
 }} ORDER BY ?sample
