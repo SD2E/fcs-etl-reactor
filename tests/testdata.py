@@ -28,7 +28,7 @@ class Secrets(object):
     '''Loads from the top-level secrets.json file'''
     def __init__(self):
 
-        self.dat = self.file_to_json('secrets.json')
+        self.dat = self.file_to_json('../secrets.json')
 
     def file_to_json(self, filename):
         fpath = os.path.join(CWD, filename)

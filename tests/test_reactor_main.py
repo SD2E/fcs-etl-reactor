@@ -67,6 +67,8 @@ def test_reactor_main(monkeypatch, caplog, capsys,
     execution = test_data
     for k in execution[0].keys():
         monkeypatch.setenv(k, execution[0].get(k, ""))
+    for s in secrets_data.keys():
+        monkeypatch.setenv(s, secrets_data[s])
     # s/reactor.py/reactor/
     import reactor as r
     with pytest.raises(SystemExit) as pytest_wrapped_e:

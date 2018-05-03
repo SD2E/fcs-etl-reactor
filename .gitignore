@@ -1,5 +1,9 @@
-data-representation/
-
+debug-job*
+analysis_parameters.json
+color_model_parameters.json
+cytometer_configuration.json
+experimental_data.json
+process_control_data.json
 # Abaco and Reactors-specific
 .agave
 .agpy

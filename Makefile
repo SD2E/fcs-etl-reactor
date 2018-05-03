@@ -4,17 +4,14 @@
 all: clean container deploy after
 	true
 
-data-representation:
-	git submodule update --init
-
 clean:
 	rm -rf .hypothesis .pytest_cache __pycache__ */__pycache__ tmp.*
 	bash tests/remove_images.sh
 
-container-py3: data-representation
+container-py3:
 	bash tests/run_deploy_with_updates.sh -R -k -F Dockerfile.py3
 
-container: data-representation
+container:
 	bash tests/run_deploy_with_updates.sh -R -k -F Dockerfile
 
 shell:

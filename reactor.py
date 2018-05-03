@@ -418,7 +418,7 @@ select distinct ?sample ?config_key ?config_val where {{
         if len(pos_cont_samples) == 0:
             positive_control_files[chan_name] = ""
             continue
-        pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
+        pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest_dict['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
         if len(pos_cont_files) == 0:
             # we should actually check for the first sample whose file was collected, rather than the first sample.
             positive_control_files[chan_name] = ""
@@ -597,8 +597,12 @@ select distinct ?sample ?config_key ?config_val where {{
         job_def.appId, "{}-{}".format(
             r.uid, r.execid))
 
-    # Expected outcome:
-    #
+    # TODO edit paths in place to point at samples directory
+    if r.local:
+        with open('debug-job-{}.json'.format(job_def.name), 'w') as jobout:
+            json.dump(job_def, jobout, sort_keys=True,
+                      indent=2, separators=(',', ':'))
+
     # An experimental data collection 'ABCDEF'
     # has (at present) directories of measurements and one or more
     # manifests (allowing for versioning). ETL apps can deposit results
