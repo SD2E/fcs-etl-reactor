@@ -35,14 +35,18 @@ def secrets_data():
     return testdata.Secrets().data()
 
 
-def test_test_data(monkeypatch, test_data):
+def test_test_data(monkeypatch, test_data, secrets_data):
     '''Ensure test data loads OK'''
     execution = test_data
     assert isinstance(execution, list)
     # executions.json contains an array of dicts with env variables to set
     for k in execution[0].keys():
         monkeypatch.setenv(k, execution[0].get(k, ""))
-    assert os.environ.get('_abaco_actor_id', None) == '2ed766bf9ccd145977c'
+    assert os.environ.get('_abaco_actor_id', None) is not '!hashid'
+    for s in secrets_data.keys():
+        monkeypatch.setenv(s, secrets_data[s])
+    assert os.environ.get('_REACTOR_SLACK_WEBHOOK', None) is not None
+    assert os.environ.get('_REACTOR_LOGS_TOKEN', None) is not None
 
 
 def test_reactor_init():

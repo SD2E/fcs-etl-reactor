@@ -17,13 +17,14 @@ class TestData(object):
     def __init__(self):
 
         self.dat = self.file_to_json('data/executions.json')
-        for (k, v) in self.dat.items():
-            if isinstance(v, basestring):
-                # Randomizes the actor and exec identifiers
-                # so that outputs whose names incorporate
-                # those strings are unique to the session
-                if '!hashid' in v:
-                    self.dat[k] = abaco_uuid() + '.local'
+        for idx in range(0, len(self.dat)):
+            for (k, v) in self.dat[idx].items():
+                if isinstance(v, basestring):
+                    # Randomizes the actor and exec identifiers
+                    # so that outputs whose names incorporate
+                    # those strings are unique to the session
+                    if '!hashid' in v:
+                        self.dat[idx][k] = abaco_uuid() + '.local'
 
     def file_to_json(self, filename):
         return json.load(open(os.path.join(HERE, filename)))
@@ -39,7 +40,7 @@ class Secrets(object):
     '''Loads from the top-level secrets.json file'''
     def __init__(self):
 
-        self.dat = self.file_to_json('../secrets.json')
+        self.dat = self.file_to_json(os.path.join(PARENT, 'secrets.json'))
 
     def file_to_json(self, filename):
         fpath = os.path.join(CWD, filename)
