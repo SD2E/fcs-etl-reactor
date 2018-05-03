@@ -2,10 +2,14 @@ __author__ = 'mwvaughn'
 
 import json
 import os
-
+import sys
+from past.builtins import basestring
+from abacofixtures import abaco_uuid
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 CWD = os.getcwd()
+PARENT = os.path.dirname(HERE)
+sys.path.insert(0, PARENT)
 
 
 class TestData(object):
@@ -13,6 +17,13 @@ class TestData(object):
     def __init__(self):
 
         self.dat = self.file_to_json('data/executions.json')
+        for (k, v) in self.dat.items():
+            if isinstance(v, basestring):
+                # Randomizes the actor and exec identifiers
+                # so that outputs whose names incorporate
+                # those strings are unique to the session
+                if '!hashid' in v:
+                    self.dat[k] = abaco_uuid() + '.local'
 
     def file_to_json(self, filename):
         return json.load(open(os.path.join(HERE, filename)))

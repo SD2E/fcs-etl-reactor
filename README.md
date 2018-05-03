@@ -31,9 +31,9 @@ Broadly...
 # test building the container
 make container NO_CACHE=1
 # run pytests inside the container
-make tests-local PYTESTOPTS=""
+make tests-pytest PYTESTOPTS=""
 # locally simulate running the reactor via message
-make tests-reactor
+make tests-local
 # deploy a specially tagged container for testing
 make trial-deploy
 # test the deployed reactor

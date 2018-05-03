@@ -17,10 +17,10 @@ container:
 shell:
 	bash tests/run_container_tests.sh bash
 
-tests-local:
+tests-pytest:
 	bash tests/run_container_tests.sh pytest tests -s -vvv $(PYTESTOPTS)
 
-tests-reactor:
+tests-local:
 	bash tests/run_local_message.sh
 
 tests-deployed:
