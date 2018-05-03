@@ -187,7 +187,7 @@ def build_color_model(channels):
     }''') # Defaulting to first channel for ERF_channel_name; all channels' names will be "GFP"
     return color_model
 
-def build_process_control_data(channels, experimental_data, cytometer_configuration_file_URI, manifest):
+def build_process_control_data(channels, positive_control_files, experimental_data, cytometer_configuration_file_URI, manifest):
     plan_uri = '<' + manifest['plan'] + '>'
     #get bead_model and bead_batch from SBH based on bead_URI
     host = 'https://hub-api.sd2e.org/sparql'
@@ -230,40 +230,6 @@ select distinct ?negative_uri where {{ {} <https://hub.sd2e.org/user/sd2e/negati
         if sample['sample'] in negative_control_URIs:
             negative_control_file = file_and_parent(sample['files'][0]['file'])
             break #keep the first one
-
-    sparql.setQuery("""
-select distinct ?sample ?config_key ?config_val where {{
-{} <https://hub.sd2e.org/user/sd2e/positive_control> ?sample .
-?sample <https://hub.sd2e.org/user/sd2e/positive_control_channel_config> ?channel_config .
-?channel_config ?config_key ?config_val
-}} ORDER BY ?sample
-""".format(plan_uri))
-    sparql.setReturnFormat(JSON)
-    results = sparql.query().convert()
-    positive_control_data = results["results"]["bindings"]
-    positive_controls = {}
-    for i in positive_control_data:
-      sample = i['sample']['value']
-      if sample not in positive_controls:
-        positive_controls[sample] = {}
-      positive_controls[sample][i['config_key']['value']] = i['config_val']['value']
-
-    channel_positive_controls = sorted([(find_channel_name(channels, c[1]), c[0]) for c in positive_controls.iteritems()])
-
-    positive_control_files = {}
-    for c in range(len(channels)):
-        chan_name = channels[c]['name']
-        pos_cont_samples = [x[1] for x in channel_positive_controls if x[0] == chan_name]
-        if len(pos_cont_samples) == 0:
-            positive_control_files[chan_name] = ""
-            continue
-        pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
-        if len(pos_cont_files) == 0:
-            # we should actually check for the first sample whose file was collected, rather than the first sample.
-            positive_control_files[chan_name] = ""
-            continue
-        positive_control_files[chan_name] = pos_cont_files[0]
-
 
     #beads and blanks/negative control
     #channel names can come from cytometer config
@@ -423,6 +389,44 @@ def main():
             'tasbe_cytometer_configuration.channels from settings',
             r.uid, r.execid), e)
 
+    plan_uri = '<' + manifest_dict['plan'] + '>'
+    host = 'https://hub-api.sd2e.org/sparql'
+    sparql = SPARQLWrapper(host)
+    sparql.setQuery("""
+select distinct ?sample ?config_key ?config_val where {{
+{} <https://hub.sd2e.org/user/sd2e/positive_control> ?sample .
+?sample <https://hub.sd2e.org/user/sd2e/positive_control_channel_config> ?channel_config .
+?channel_config ?config_key ?config_val
+}} ORDER BY ?sample
+""".format(plan_uri))
+    sparql.setReturnFormat(JSON)
+    results = sparql.query().convert()
+    positive_control_data = results["results"]["bindings"]
+    positive_controls = {}
+    for i in positive_control_data:
+        sample = i['sample']['value']
+        if sample not in positive_controls:
+            positive_controls[sample] = {}
+        positive_controls[sample][i['config_key']['value']] = i['config_val']['value']
+
+    channel_positive_controls = sorted([(find_channel_name(channels, c[1]), c[0]) for c in positive_controls.iteritems()])
+
+    positive_control_files = {}
+    for c in range(len(channels)):
+        chan_name = channels[c]['name']
+        pos_cont_samples = [x[1] for x in channel_positive_controls if x[0] == chan_name]
+        if len(pos_cont_samples) == 0:
+            positive_control_files[chan_name] = ""
+            continue
+        pos_cont_files = [file_and_parent(x['files'][0]['file']) for x in manifest['samples'] if x['sample'] == pos_cont_samples[0] and x['collected']]
+        if len(pos_cont_files) == 0:
+            # we should actually check for the first sample whose file was collected, rather than the first sample.
+            positive_control_files[chan_name] = ""
+            continue
+        positive_control_files[chan_name] = pos_cont_files[0]
+
+    channels = [c for c in channels if c.get('name', '') in positive_control_files]
+
 #     r.logger.debug("loading dict from plan JSON file {}".format(plan_file))
 #     try:
 #         plan = json.load(open(plan_file, 'rb'))
@@ -440,7 +444,7 @@ def main():
     try:
         r.logger.debug('  writing process_control_data')
         with open('process_control_data.json', 'wb') as outfile:
-            json.dump(build_process_control_data(channels, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
+            json.dump(build_process_control_data(channels, positive_control_files, experimental_data, instrument_config_uri,manifest_dict), outfile, sort_keys=True,indent=4,separators=(',', ': '))
         r.logger.debug('  color_model_parameters')
         with open('color_model_parameters.json', 'wb') as outfile:
             json.dump(build_color_model(channels), outfile, sort_keys=True,indent=4,separators=(',', ': '))
