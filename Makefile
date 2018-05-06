@@ -6,6 +6,7 @@ all: clean container deploy after
 
 clean:
 	rm -rf .hypothesis .pytest_cache __pycache__ */__pycache__ tmp.*
+	rm -rf analysis_parameters.json color_model_parameters.json cytometer_configuration.json experimental_data.json process_control_data.json
 	bash tests/remove_images.sh
 
 container-py3:
